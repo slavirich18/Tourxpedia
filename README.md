@@ -14,12 +14,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/slavirich18/Tourxpedia/actions/workflows/laravel-ci.yml">
-    <img src="https://github.com/slavirich18/Tourxpedia/actions/workflows/laravel-ci.yml/badge.svg" alt="Laravel CI">
-  </a>
-  <a href="https://github.com/slavirich18/Tourxpedia/actions/workflows/lint.yml">
-    <img src="https://github.com/slavirich18/Tourxpedia/actions/workflows/lint.yml/badge.svg" alt="Lint & Static Analysis">
-  </a>
+  <a href="...laravel-ci.yml"><img src="...laravel-ci.yml/badge.svg" alt="Laravel CI"></a>
+  <a href="...lint.yml"><img src="...lint.yml/badge.svg" alt="Lint & Static Analysis"></a>
 </p>
 
 ---
@@ -56,7 +52,9 @@ php artisan key:generate
 php artisan migrate --seed
 php artisan serve
 
-## 🔐 Environment variables
+---
+
+## 🔐 Променливи на средата
 
 Примерни ключови настройки за `backend/.env`:
 
@@ -95,14 +93,56 @@ MAIL_FROM_NAME="${APP_NAME}"
 JWT_SECRET=   # генерира се: php artisan jwt:secret
 JWT_TTL=60
 
+---
+
 ## 📚 API документация
 
-- Swagger (локално): `http://localhost:8000/api/docs`  
-- Прод: `https://api.tourxpedia.com/api/docs`  _(примерен URL – замени, когато имаш реален)_
+Документацията на API-то описва всички налични ендпойнти, параметри и примери за използване.  
+Тя е полезна както за FE екипа, така и за външни интеграции (партньори, агенции и др.).
 
-> **Бележка:** Документацията ще бъде публикувана с OpenAPI/Swagger.  
-> Ако използваме L5-Swagger за Laravel:  
-> 1) `composer require "l5-swagger/l5-swagger"`  
-> 2) `php artisan vendor:publish --provider "L5Swagger\L5SwaggerServiceProvider"`  
-> 3) Добавя се рут към `/api/documentation` (по подразбиране).  
-> 4) Генерация: `php artisan l5-swagger:generate`
+### Локална среда
+- Swagger UI: [http://localhost:8000/api/docs](http://localhost:8000/api/docs)
+
+### Production (примерен URL – ще се актуализира)
+- Swagger UI: [https://api.tourxpedia.com/api/docs](https://api.tourxpedia.com/api/docs)
+
+### Инсталация (ако използваме L5-Swagger за Laravel)
+1. Инсталирай пакета:  
+   ```bash
+   composer require "l5-swagger/l5-swagger"
+
+---
+
+## 📂 Архитектура (WIP)
+
+/backend # Laravel API
+/database # миграции и сидъри
+.github/
+workflows/ # CI (laravel-ci.yml, lint.yml)
+docs/assets/ # лога/изображения
+
+> ℹ️ Структурата ще се доразширява с нови директории (например `/frontend`, `/ai`), когато проектът напредне.
+
+---
+
+## 🗺️ Пътна карта (Roadmap)
+
+- [ ] Модели/миграции: organizations, organization_members, payout_accounts
+- [ ] Каталог: properties/units/availability/prices
+- [ ] Bookings + правила за достъп (Policies)
+- [ ] AI: event logging, /ai/search с pgvector, препоръки
+- [ ] Деплой: FE (Vercel) + BE (Railway/Render)
+- [ ] API документация (Swagger/Stoplight)
+- [ ] Vision search + Trip builder
+
+---
+
+## 🤝 Принос (Contributing)
+
+Приемаме PR-и и issue-та. Преди да отвориш PR, моля:
+
+1. Увери се, че тестовете минават локално:
+   ```bash
+   php artisan test
+
+---
