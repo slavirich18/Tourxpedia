@@ -1,7 +1,5 @@
 # Tourxpedia
 
-[![Laravel CI](https://github.com/slavirich18/Tourxpedia/actions/workflows/laravel-ci.yml/badge.svg)](https://github.com/slavirich18/Tourxpedia/actions/workflows/laravel-ci.yml)
-
 <p align="center">
   <a href="https://www.tourxpedia.com" target="_blank" rel="noopener">
     <img src="docs/assets/LOGO600X.png" alt="Tourxpedia Logo" width="200">
