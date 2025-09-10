@@ -1,0 +1,7 @@
+{
+  "security.workspace.trustedDomains": [
+    "https://intelephense.com",
+    "https://laravel.com",
+    "https://phpstan.org"
+  ]
+}
