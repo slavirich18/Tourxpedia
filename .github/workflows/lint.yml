@@ -1,0 +1,49 @@
+name: Lint & Static Analysis
+
+on:
+  pull_request:
+    branches: [ "main", "develop" ]
+  push:
+    branches: [ "feature/**" ]
+  workflow_dispatch: {}
+
+concurrency:
+  group: lint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+        shell: bash
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          tools: composer:v2
+
+      - name: Install deps
+        run: composer install --no-ansi --no-interaction --no-progress --prefer-dist
+
+      - name: Pint (code style)
+        run: |
+          if [ -f vendor/bin/pint ]; then
+            vendor/bin/pint --test
+          else
+            echo "Pint not installed"
+          fi
+
+      - name: PHPStan (static analysis)
+        run: |
+          if [ -f vendor/bin/phpstan ]; then
+            vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+          else
+            echo "PHPStan not installed"
+          fi

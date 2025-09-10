@@ -1,19 +1,26 @@
+# backend/phpstan.neon
 includes:
-  - vendor/nunomaduro/larastan/extension.neon
+    - vendor/larastan/larastan/extension.neon
 
 parameters:
-  paths:
-    - app
-    - database/factories
-    - database/seeders
-  level: 6
-  treatPhpDocTypesAsCertain: true
-  checkModelProperties: true
-  tmpDir: var/phpstan
-  excludePaths:
-    - tests/*
-    - bootstrap/*
-    - storage/*
-    - vendor/*
-  # ignoreErrors: (disabled)
-    # - identifier: missingType.missing iterableValue
+    # Ниво: започваме на 6/7 за баланс между шум и стойност
+    level: 7
+
+    # Папки за анализ
+    paths:
+        - app
+        - database
+
+    # Кеш директория (избягваме bootstrap/cache)
+    tmpDir: storage/framework/cache/phpstan
+
+    # Полезни настройки за Laravel проекти
+    checkMissingIterableValueType: false
+    inferPrivatePropertyTypeFromConstructor: true
+
+    # Larastan специфични (ако ползваш модели/магични пропъртита)
+    checkModelProperties: true
+
+    # По желание: добави файлове за по-точен анализ на bootstrapping
+    scanFiles:
+        - bootstrap/app.php

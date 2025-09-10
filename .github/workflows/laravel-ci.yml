@@ -1,0 +1,83 @@
+name: Laravel CI
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        ports: ["5432:5432"]
+        env:
+          POSTGRES_DB: tourxpedia_test
+          POSTGRES_USER: laravel
+          POSTGRES_PASSWORD: laravel
+        options: >-
+          --health-cmd="pg_isready -U laravel -d tourxpedia_test"
+          --health-interval=10s --health-timeout=5s --health-retries=5
+
+    defaults:
+      run:
+        working-directory: backend
+        shell: bash
+
+    env:
+      APP_ENV: testing
+      APP_DEBUG: "false"
+      DB_CONNECTION: pgsql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_DATABASE: tourxpedia_test
+      DB_USERNAME: laravel
+      DB_PASSWORD: laravel
+      CACHE_DRIVER: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: pdo_pgsql, mbstring, bcmath, intl, gd
+          coverage: none
+          tools: composer:v2
+
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache/files
+          key: ${{ runner.os }}-composer-${{ hashFiles('backend/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install PHP dependencies
+        run: composer install --no-ansi --no-interaction --no-progress --prefer-dist
+
+      - name: Prepare .env & key
+        run: |
+          cp .env.example .env
+          php artisan key:generate --ansi
+
+      - name: Wait for Postgres
+        run: |
+          for i in {1..20}; do
+            (echo > /dev/tcp/127.0.0.1/5432) >/dev/null 2>&1 && break
+            echo "⏳ Waiting for Postgres..."
+            sleep 3
+          done
+
+      - name: Run migrations
+        run: php artisan migrate:fresh --seed --force
+
+      - name: Run tests
+        run: php artisan test --colors=never -q
