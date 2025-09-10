@@ -1,0 +1,19 @@
+includes:
+  - vendor/nunomaduro/larastan/extension.neon
+
+parameters:
+  paths:
+    - app
+    - database/factories
+    - database/seeders
+  level: 6
+  treatPhpDocTypesAsCertain: true
+  checkModelProperties: true
+  tmpDir: var/phpstan
+  excludePaths:
+    - tests/*
+    - bootstrap/*
+    - storage/*
+    - vendor/*
+  # ignoreErrors: (disabled)
+    # - identifier: missingType.missing iterableValue

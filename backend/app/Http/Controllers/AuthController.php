@@ -7,13 +7,14 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\JsonResponse;
 use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Lcobucci\JWT\Signer\Key\InMemory;
 
 final class AuthController extends Controller
 {
-    public function signup(Request $request)
+    public function signup(Request $request): JsonResponse
     {
         $data = $request->validate([
             'name' => 'required|string|max:100',
@@ -21,7 +22,7 @@ final class AuthController extends Controller
             'password' => 'required|string|min:8',
         ]);
 
-        $user = new User;
+        $user = new User();
         $user->name = $data['name'];
         $user->email = $data['email'];
         $user->password = Hash::make($data['password']);
@@ -30,15 +31,16 @@ final class AuthController extends Controller
         return response()->json(['ok' => true, 'data' => ['id' => $user->id]], 201);
     }
 
-    public function login(Request $request)
+    public function login(Request $request): JsonResponse
     {
         $data = $request->validate([
             'email' => 'required|email:rfc',
             'password' => 'required|string',
         ]);
 
-        $user = User::where('email', $data['email'])->first();
-        if (! $user || ! Hash::check($data['password'], $user->password)) {
+        $user = User::query()->where('email', $data['email'])->first();
+
+        if (!$user || !Hash::check($data['password'], $user->password)) {
             return response()->json([
                 'ok' => false,
                 'error' => ['code' => 'INVALID_CREDENTIALS', 'message' => 'Wrong email or password'],
@@ -47,11 +49,12 @@ final class AuthController extends Controller
 
         // JWT (lcobucci/jwt ^4.x)
         $cfg = Configuration::forSymmetricSigner(
-            new Sha256,
+            new Sha256(),
             InMemory::plainText(env('JWT_SECRET', 'dev-secret-change'))
         );
 
         $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+
         $token = $cfg->builder()
             ->issuedBy(config('app.url') ?: 'tourxpedia')
             ->issuedAt($now)
@@ -63,23 +66,34 @@ final class AuthController extends Controller
             'ok' => true,
             'data' => [
                 'token' => $token->toString(),
-                'user' => ['id' => $user->id, 'email' => $user->email, 'name' => $user->name],
+                'user' => [
+                    'id' => $user->id,
+                    'email' => $user->email,
+                    'name' => $user->name,
+                ],
             ],
         ]);
     }
 
-    public function me(Request $request)
+    public function me(Request $request): JsonResponse
     {
         /** @var User|null $user */
         $user = $request->attributes->get('auth_user');
-        if (! $user) {
-            return response()->json(['ok' => false, 'error' => ['code' => 'NO_USER', 'message' => 'Unauthenticated']], 401);
+
+        if (!$user) {
+            return response()->json([
+                'ok' => false,
+                'error' => ['code' => 'NO_USER', 'message' => 'Unauthenticated'],
+            ], 401);
         }
 
-        return response()->json(['ok' => true, 'data' => [
-            'id' => $user->id,
-            'email' => $user->email,
-            'name' => $user->name,
-        ]]);
+        return response()->json([
+            'ok' => true,
+            'data' => [
+                'id' => $user->id,
+                'email' => $user->email,
+                'name' => $user->name,
+            ],
+        ]);
     }
 }
