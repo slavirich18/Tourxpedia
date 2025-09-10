@@ -3,6 +3,9 @@ name: Lint & Static Analysis
 on:
   pull_request:
     branches: [ "main", "develop" ]
+  push:
+    branches: [ "feature/**" ]
+  workflow_dispatch: {}
 
 concurrency:
   group: lint-${{ github.ref }}
@@ -14,11 +17,14 @@ jobs:
     defaults:
       run:
         working-directory: backend
+        shell: bash
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: shivammathur/setup-php@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
           php-version: "8.3"
           tools: composer:v2
@@ -28,56 +34,16 @@ jobs:
 
       - name: Pint (code style)
         run: |
-          if [ -f vendor/bin/pint ]; then vendor/bin/pint --test; else echo "Pint not installed"; fi
+          if [ -f vendor/bin/pint ]; then
+            vendor/bin/pint --test
+          else
+            echo "Pint not installed"
+          fi
 
       - name: PHPStan (static analysis)
         run: |
-          if [ -f vendor/bin/phpstan ]; then vendor/bin/phpstan analyse --no-progress; else echo "PHPStan not installed"; fi
-След това направи едно от двете, за да се стартира workflow-ът поне веднъж:
-
-отвори PR към main/develop, или
-
-пушни комит в клон feature/... (както е конфигурирано по-горе), или временно добави и:
-
-yaml
-Copy code
-on:
-  push:
-    branches: [ "main", "develop" ]
-  pull_request:
-    branches: [ "main", "develop" ]
-След първия успешен рън баджът ще се визуализира правилно.
-
-Леки предложения за оформление на README
-В момента имаш две заглавия: # Tourxpedia и <h1 align="center">Tourxpedia</h1>. Избери едното. Ако искаш центриран стил, остави HTML варианта и махни горното # Tourxpedia. Ако искаш класически Markdown, остави # Tourxpedia и махни центрираното <h1>.
-
-Имаш дублиран CI бадж (веднъж горе и веднъж в центрирания блок). Остави само реда в центрирания блок.
-
-Иконките/емоджитата в секциите са приятни; дръж ги последователни.
-
-По желание: добави линк към API документация (ако ще правим Swagger/Stoplight) и секция „Environment variables“.
-
-Пример за “изчистен” хедър (ако избереш центрирания стил)
-md
-Copy code
-<p align="center">
-  <a href="https://www.tourxpedia.com" target="_blank" rel="noopener">
-    <img src="docs/assets/LOGO600X.png" alt="Tourxpedia Logo" width="200">
-  </a>
-</p>
-
-<h1 align="center">Tourxpedia</h1>
-
-<p align="center">
-  Маркетплейс и туристическа енциклопедия: имоти/оферти, календар на събития и групови резервации.
-  Backend: Laravel + PostgreSQL (JWT). Планиран FE на Vercel, API на Railway/Render.
-</p>
-
-<p align="center">
-  <a href="https://github.com/slavirich18/Tourxpedia/actions/workflows/laravel-ci.yml">
-    <img src="https://github.com/slavirich18/Tourxpedia/actions/workflows/laravel-ci.yml/badge.svg" alt="Laravel CI">
-  </a>
-  <a href="https://github.com/slavirich18/Tourxpedia/actions/workflows/lint.yml">
-    <img src="https://github.com/slavirich18/Tourxpedia/actions/workflows/lint.yml/badge.svg" alt="Lint & Static Analysis">
-  </a>
-</p>
+          if [ -f vendor/bin/phpstan ]; then
+            vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+          else
+            echo "PHPStan not installed"
+          fi
