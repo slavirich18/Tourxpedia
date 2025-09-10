@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Http\JsonResponse;
 use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Lcobucci\JWT\Signer\Key\InMemory;
@@ -22,7 +22,7 @@ final class AuthController extends Controller
             'password' => 'required|string|min:8',
         ]);
 
-        $user = new User();
+        $user = new User;
         $user->name = $data['name'];
         $user->email = $data['email'];
         $user->password = Hash::make($data['password']);
@@ -40,7 +40,7 @@ final class AuthController extends Controller
 
         $user = User::query()->where('email', $data['email'])->first();
 
-        if (!$user || !Hash::check($data['password'], $user->password)) {
+        if (! $user || ! Hash::check($data['password'], $user->password)) {
             return response()->json([
                 'ok' => false,
                 'error' => ['code' => 'INVALID_CREDENTIALS', 'message' => 'Wrong email or password'],
@@ -49,7 +49,7 @@ final class AuthController extends Controller
 
         // JWT (lcobucci/jwt ^4.x)
         $cfg = Configuration::forSymmetricSigner(
-            new Sha256(),
+            new Sha256,
             InMemory::plainText(env('JWT_SECRET', 'dev-secret-change'))
         );
 
@@ -80,7 +80,7 @@ final class AuthController extends Controller
         /** @var User|null $user */
         $user = $request->attributes->get('auth_user');
 
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'ok' => false,
                 'error' => ['code' => 'NO_USER', 'message' => 'Unauthenticated'],
