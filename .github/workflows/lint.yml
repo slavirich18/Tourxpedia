@@ -3,8 +3,6 @@ name: Lint & Static Analysis
 on:
   pull_request:
     branches: [ "main", "develop" ]
-  push:
-    branches: [ "feature/**" ]  # по желание – пускай lint и при пуш в feature клонове
 
 concurrency:
   group: lint-${{ github.ref }}
