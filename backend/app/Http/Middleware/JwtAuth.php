@@ -34,7 +34,7 @@ final class JwtAuth
         }
 
         $cfg = Configuration::forSymmetricSigner(
-            new Sha256(),
+            new Sha256,
             InMemory::plainText($secret)
         );
         $cfg->setValidationConstraints(new ValidAt(new SystemClock(new \DateTimeZone('UTC'))));
