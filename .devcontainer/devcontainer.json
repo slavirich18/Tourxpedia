@@ -1,0 +1,28 @@
+{
+  "name": "Tourxpedia Laravel",
+  "image": "mcr.microsoft.com/devcontainers/php:8.2",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": { "version": "18" },
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
+  "workspaceFolder": "/workspaces/Tourxpedia",
+  "postCreateCommand": "bash .devcontainer/init-deps.sh",
+  "postStartCommand": "bash .devcontainer/init-run.sh",
+  "forwardPorts": [8000],
+  "portsAttributes": {
+    "8000": { "label": "Laravel API", "onAutoForward": "openBrowser" }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "bmewburn.vscode-intelephense-client",
+        "xdebug.php-pack",
+        "ms-azuretools.vscode-docker",
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "php.suggest.basic": false
+      }
+    }
+  }
+}

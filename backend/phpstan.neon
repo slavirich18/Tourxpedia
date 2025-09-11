@@ -1,15 +1,26 @@
-parameters:
-    level: 5
+# backend/phpstan.neon
+includes:
+    - vendor/larastan/larastan/extension.neon
 
+parameters:
+    # Ниво: започваме на 6/7 за баланс между шум и стойност
+    level: 7
+
+    # Папки за анализ
     paths:
         - app
         - database
 
-    excludePaths:
-        - tests/*
-        - bootstrap/*
-        - storage/*
-        - vendor/*
+    # Кеш директория (избягваме bootstrap/cache)
+    tmpDir: storage/framework/cache/phpstan
 
+    # Полезни настройки за Laravel проекти
     checkMissingIterableValueType: false
-    treatPhpDocTypesAsCertain: false
+    inferPrivatePropertyTypeFromConstructor: true
+
+    # Larastan специфични (ако ползваш модели/магични пропъртита)
+    checkModelProperties: true
+
+    # По желание: добави файлове за по-точен анализ на bootstrapping
+    scanFiles:
+        - bootstrap/app.php
