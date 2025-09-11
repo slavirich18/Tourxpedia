@@ -27,9 +27,15 @@ final class JwtAuth
             ], 401);
         }
 
+        // JWT (lcobucci/jwt ^4.x)
+        $secret = (string) config('jwt.secret', '');
+        if ($secret === '') {
+            throw new \RuntimeException('JWT_SECRET is not set or empty.');
+        }
+
         $cfg = Configuration::forSymmetricSigner(
-            new Sha256,
-            InMemory::plainText(env('JWT_SECRET', 'dev-secret-change'))
+            new Sha256(),
+            InMemory::plainText($secret)
         );
         $cfg->setValidationConstraints(new ValidAt(new SystemClock(new \DateTimeZone('UTC'))));
 
